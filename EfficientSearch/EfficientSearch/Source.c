@@ -1,8 +1,9 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
+#include <stdlib.h>		//for exit
+#include <ctype.h>		//for isspace
+#include <time.h>		//for time
 
-#define MAXLEN 100
+#define MAXLEN 1000000
 #define INTCMP(x,y) (((x)>(y))?1:(((x)==(y))?0:-1))
 #define INTSWAP(x,y) {int t; t = (x); (x) = (y); (y) = t;}
 
@@ -10,20 +11,56 @@ int no_list[MAXLEN + 1];
 int list_len = 0;
 int item;
 
+void GenRandom();
 void GetNoList();
 void InsertSort();
 void PrintList();
 int BinSearchIter();
 int BinSearchRecur(int low, int high);
+int SeqSearch();
 
 int main() {
-	GetNoList();
+	clock_t start, stop;
+
+	//둘 중 하나를 취사선택
+	GenRandom();
+	//GetNoList();
+
 	InsertSort();
-	PrintList();
+	//PrintList();
+	
+	start = clock();
 	printf("BinSearchIter: %d\n", BinSearchIter());
+	stop = clock();
+	printf("%e elapsed\n\n", (double)(stop-start)/CLOCKS_PER_SEC);
+
+	start = clock();
 	printf("BinSearchRecur: %d\n", BinSearchRecur(0, list_len - 1));
+	stop = clock();
+	printf("%e elapsed\n\n", (double)(stop - start) / CLOCKS_PER_SEC);
+
+	start = clock();
+	printf("SeqSearch: %d\n", SeqSearch());
+	stop = clock();
+	printf("%e elapsed\n\n", (double)(stop - start) / CLOCKS_PER_SEC);
 
 	return 0;
+}
+
+void GenRandom() {
+	int len;
+	int i;
+
+	srand(time(NULL));
+
+	len = 50000;
+
+	for (i = 0; i < len; i++)
+		no_list[i] = rand() % (len*10);
+
+	list_len = len;
+
+	item = rand() % (len * 10);
 }
 
 void GetNoList() {
@@ -111,4 +148,14 @@ int BinSearchRecur(int low, int high) {
 	case -1:	//item < mid number
 		return BinSearchRecur(low, mid - 1);
 	}
+}
+
+int SeqSearch() {
+	int i;
+
+	for (i = 0; i < list_len; i++)
+		if (no_list[i] == item)
+			return i;
+
+	return -1;
 }
